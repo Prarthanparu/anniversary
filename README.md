@@ -1,70 +1,217 @@
-# Getting Started with Create React App
+# Vanta JS
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## [View demo gallery & customize effects at www.vantajs.com &rarr;](https://www.vantajs.com)
 
-## Available Scripts
+[![alt text](https://www.vantajs.com/gallery/vanta-preview.gif "Vanta JS")](https://www.vantajs.com)
 
-In the project directory, you can run:
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## What is Vanta? / FAQs
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Add 3D animated digital art to any webpage with just a few lines of code.**
+- How it works: Vanta inserts an animated effect as a background into any HTML element.
+- Works with vanilla JS, React, Angular, Vue, etc.
+- Effects are rendered by [three.js](https://github.com/mrdoob/three.js/) (using WebGL) or [p5.js](https://github.com/processing/p5.js).
+- Effects can interact with mouse/touch inputs.
+- Effect parameters (e.g. color) can be easily modified to match your brand.
+- Total additional file size is ~120kb minified and gzipped (mostly three.js), which is smaller than comparable background images/videos.
+- Vanta includes many predefined effects to try out. *More effects will be added soon!*
 
-### `npm test`
+## [View demo gallery & customize effects at www.vantajs.com &rarr;](https://www.vantajs.com)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Basic usage with script tags:
 
-### `npm run build`
+```html
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanta@0.5.21/dist/vanta.waves.min.js"></script>
+<script>
+  VANTA.WAVES('#my-background')
+</script>
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+[View fiddle &rarr;](https://jsfiddle.net/vuwqs6kf/2/)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## More options:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```js
+VANTA.WAVES({
+  el: '#my-background', // element selector string or DOM object reference
+  color: 0x000000,
+  waveHeight: 20,
+  shininess: 50,
+  waveSpeed: 1.5,
+  zoom: 0.75
+})
+```
 
-### `npm run eject`
+- **el:** The container element.
+  - The Vanta canvas will be appended as a child of this element, and will assume the width and height of this element. (If you want a fullscreen canvas, make sure this container element is fullscreen.)
+  - This container *can* have other children. The other children will appear as foreground content, in front of the Vanta canvas.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- **mouseControls:** (defaults to *true*) Set to false to disable mouse controls. Only applies to certain effects.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **touchControls:** (defaults to *true*) Set to false to disable touch controls. Only applies to certain effects.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **gyroControls:** (defaults to *false*) Set to true to allow gyroscope to imitate mouse. Only applies to certain effects.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- **NOTE:** Each effect has its own specific parameters. Explore them all at www.vantajs.com!
 
-## Learn More
+## Updating options after init:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```js
+const effect = VANTA.WAVES({
+  el: '#my-background',
+  color: 0x000000
+})
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+// Later, when you want to update an animation in progress with new options
+effect.setOptions({
+  color: 0xff88cc
+})
 
-### Code Splitting
+// Later, if the container changes size and you want to force Vanta to redraw at the new canvas size
+effect.resize()
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Cleanup:
 
-### Analyzing the Bundle Size
+```js
+const effect = VANTA.WAVES('#my-background')
+effect.destroy() // e.g. call this in React's componentWillUnmount
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Usage with React:
 
-### Making a Progressive Web App
+`npm i vanta`, then import a specific effect as follows. Make sure `three.js` or `p5.js` has already been included via &lt;script> tag.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```js
+import React from 'react'
+import BIRDS from 'vanta/dist/vanta.birds.min'
+// Make sure window.THREE is defined, e.g. by including three.min.js in the document head using a <script> tag
 
-### Advanced Configuration
+class MyComponent extends React.Component {
+  constructor() {
+    super()
+    this.vantaRef = React.createRef()
+  }
+  componentDidMount() {
+    this.vantaEffect = BIRDS({
+      el: this.vantaRef.current
+    })
+  }
+  componentWillUnmount() {
+    if (this.vantaEffect) this.vantaEffect.destroy()
+  }
+  render() {
+    return <div ref={this.vantaRef}>
+      Foreground content goes here
+    </div>
+  }
+}
+```
+[View fiddle &rarr;](https://jsfiddle.net/tsrwxzyL/2/)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Usage with React Hooks (requires React 16.8):
 
-### Deployment
+```js
+import React, { useState, useEffect, useRef } from 'react'
+import BIRDS from 'vanta/dist/vanta.birds.min'
+// Make sure window.THREE is defined, e.g. by including three.min.js in the document head using a <script> tag
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+const MyComponent = (props) => {
+  const [vantaEffect, setVantaEffect] = useState(0)
+  const myRef = useRef(null)
+  useEffect(() => {
+    if (!vantaEffect) {
+      setVantaEffect(BIRDS({
+        el: myRef.current
+      }))
+    }
+    return () => {
+      if (vantaEffect) vantaEffect.destroy()
+    }
+  }, [vantaEffect])
+  return <div ref={myRef}>
+    Foreground content goes here
+  </div>
+}
+```
 
-### `npm run build` fails to minify
+## Usage with Vue 2 (SFC):
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```vue
+<template>
+  <div ref='vantaRef'>
+    Foreground content here
+  </div>
+</template>
+
+<script>
+import BIRDS from 'vanta/src/vanta.birds'
+// Make sure window.THREE is defined, e.g. by including three.min.js in the document head using a <script> tag
+
+export default {
+  mounted() {
+    this.vantaEffect = BIRDS({
+      el: this.$refs.vantaRef
+    })
+  },
+  beforeDestroy() {
+    if (this.vantaEffect) {
+      this.vantaEffect.destroy()
+    }
+  }
+}
+</script>
+```
+
+## Using THREE or p5 from npm
+
+For effects that use three.js, you can import `three` from npm, and pass it into the effect function.
+
+```js
+import React from 'react'
+import * as THREE from 'three'
+import BIRDS from 'vanta/dist/vanta.birds.min'
+
+...
+  componentDidMount() {
+    this.vantaEffect = BIRDS({
+      el: this.vantaRef.current,
+      THREE: THREE // use a custom THREE when initializing
+    })
+  }
+...
+```
+
+For effects that use p5.js, you can import `p5` from npm, and pass it into the effect function.
+
+```js
+import React from 'react'
+import p5 from 'p5'
+import TRUNK from 'vanta/dist/vanta.trunk.min'
+
+...
+  componentDidMount() {
+    this.vantaEffect = TRUNK({
+      el: this.vantaRef.current,
+      p5: p5 // use a custom p5 when initializing
+    })
+  }
+...
+```
+
+
+## Local dev:
+
+Clone the repo, switch to the `gallery` branch, run `npm install` and `npm run dev`, and go to localhost:8080.
+
+## Credits
+
+- General inspiration from [shadertoy.com](https://www.shadertoy.com), [#generative](https://www.twitter.com/hashtag/generative), [/r/generative](https://www.reddit.com/r/generative/), [/r/creativecoding](https://www.reddit.com/r/creativecoding/), etc
+
+- Birds effect from https://threejs.org/examples/?q=birds#webgl_gpgpu_birds by @zz85
+- Fog effect from https://thebookofshaders.com/13/ by @patriciogonzalezvivo
+- Clouds effect from https://www.shadertoy.com/view/XslGRr by Inigo Quilez
+- Clouds2 effect from https://www.shadertoy.com/view/lsBfDz by Rune Stubbe
+- Trunk, Topology effects from http://generated.space/ by Kjetil Midtgarden Golid @kgolid
